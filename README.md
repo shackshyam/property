@@ -1,308 +1,237 @@
-# Add Property Form — Field Guide & Dependencies
+# Add Project Form — Field Guide & Dependencies
 
-> This document explains every field in the **Add Property** form, what it does, and which fields appear or disappear based on your selections.
+> This document explains every field in the **Add / Edit Project** form, what each one does, and how some fields depend on others.
 
 ---
 
 ## 📋 How the Form Works
 
-The form has two modes:
+Unlike the Property and Lead forms, the Project form does **not** have a Quick / Advance toggle. All fields are visible at all times. The form is organized into **5 sections**:
 
-| Mode | What you see |
-|------|-------------|
-| **Quick** | Only the essential fields — Property For, Property Type, Category, Project Name, Address, Area, and Price |
-| **Advance** | All fields — everything in Quick mode plus Features, Amenities, Legal Details, Media uploads, and Private Details |
+| # | Section | What it covers |
+|:-:|---------|---------------|
+| 1 | **Project Info** | Basic details — name, location, developer, construction status |
+| 2 | **Project Attributes** | Physical features — area, furnishing, amenities, parking, utilities, media, legal docs |
+| 3 | **Nearby Locations** | Points of interest around the project |
+| 4 | **Project Layout** | Wing/tower structure — floors and units |
+| 5 | **Owner Details** | Private owner contact info (collapsible) |
 
 > [!IMPORTANT]
-> The two most important fields are **Property For** and **Property Type**. Almost every other field on the form depends on one or both of these selections.
+> The main dependency in this form is **Construction Status**. Changing it determines whether you see the **Age of Property** field or the **Possession By** field. The **Furnished Status** field also controls the **Furnished Details** dropdown.
 
 ---
 
-## 🔗 Master Dependency Chain
+## 🔗 Master Dependency Overview
 
 ```mermaid
 graph TD
-    A["🏠 Property For<br>(Sell or Rent)"]
-    B["🏢 Property Type<br>(Residential / Commercial / Industrial / Plot)"]
-    C["All other fields<br>on the form"]
+    CS["🏗️ Construction Status<br>(Ready To Move / Under Construction)"]
+    FS["🛋️ Furnished Status<br>(Unfurnished / Semi-Furnished / Furnished)"]
 
-    A -->|"controls"| B
-    A -->|"controls"| C
-    B -->|"controls"| C
+    CS -->|"Ready To Move"| AOP["📅 Age of Property<br>(shown, required)"]
+    CS -->|"Under Construction"| PB["📅 Possession By<br>(shown, required)"]
 
-    style A fill:#2E86C1,color:#fff,stroke:#1B4F72
-    style B fill:#2E86C1,color:#fff,stroke:#1B4F72
-    style C fill:#85C1E9,color:#1B4F72,stroke:#2E86C1
+    FS -->|"Furnished / Semi-Furnished"| FD["📝 Furnished Details<br>(shown with filtered options)"]
+    FS -->|"Unfurnished"| FD_HIDE["Furnished Details hidden"]
+
+    style CS fill:#2E86C1,color:#fff
+    style FS fill:#E67E22,color:#fff
+    style AOP fill:#27AE60,color:#fff
+    style PB fill:#27AE60,color:#fff
+    style FD fill:#9B59B6,color:#fff
 ```
-
-> When you change **Property For**, it automatically re-evaluates **Property Type** and everything below it. When you change **Property Type**, it re-evaluates all feature, amenity, and legal fields.
 
 ---
 
-## Section 1: Overview
+## Section 1: Project Info
 
 | # | Field Name | Required? | What it does |
-|---|-----------|-----------|-------------|
-| 1 | **Property For** | ✅ Yes | Choose **Sell** or **Rent/Lease** |
-| 2 | **Property From** | ✅ Yes | Choose **Owner (Resale)** or **Developer (First Sale)** |
-| 3 | **Property Type** | ✅ Yes | Choose **Residential**, **Commercial**, **Industrial**, or **Plot** |
-| 4 | **Property Category** | ✅ Yes | Subcategory (e.g., Flat, Bungalow, Office Space, Warehouse, etc.) |
+|---|-----------|:---------:|-------------|
+| 1 | **Project Name** | ✅ Yes | The name of the project/society/complex |
+| 2 | **Project Rera Number** | No | RERA registration number. Only uppercase letters, numbers, and `/` are allowed |
+| 3 | **Developed by** | No | The builder or developer company name |
+| 4 | **Market By** | No | The marketing company name |
+| 5 | **Locality / Street** | ✅ Yes | Project address — auto-fills from Google Maps or can be changed manually via a popup |
+| 6 | **Construction Status** | ✅ Yes | Current state of the project |
+| 7 | **Age of Property** | ✅ Yes* | How old the property is — *only shown when Construction Status is "Ready To Move"* |
+| 8 | **Possession By** | ✅ Yes* | Expected possession date — *only shown when Construction Status is "Under Construction"* |
 
-### Dependencies in this section
+### Construction Status Dependency
+
+This is the most important dependency in the form:
 
 ```mermaid
 graph LR
-    PF{"Property For"}
-    SELL["Sell"]
-    RENT["Rent / Lease"]
+    CS{"Construction Status"}
+    RTM["Ready To Move"]
+    UC["Under Construction"]
 
-    PF --> SELL
-    PF --> RENT
 
-    SELL --> S1["✅ Property From is visible"]
-    SELL --> S2["✅ Plot option available in Property Type"]
+    CS --> RTM
+    CS --> UC
 
-    RENT --> R1["❌ Property From is hidden"]
-    RENT --> R2["❌ Plot option removed from Property Type"]
 
-    style SELL fill:#27AE60,color:#fff
-    style RENT fill:#E67E22,color:#fff
+    RTM --> A1["✅ Age of Property — shown & required"]
+    RTM --> A2["❌ Possession By — hidden"]
+
+    UC --> B1["❌ Age of Property — hidden"]
+    UC --> B2["✅ Possession By — shown & required"]
+
+ 
+
+    style RTM fill:#27AE60,color:#fff
+    style UC fill:#3498DB,color:#fff
+ 
 ```
 
-- **Property Category** options change depending on **Property Type**:
-  - *Residential* → Flat, Bungalow, Penthouse, Villa, etc.
-  - *Commercial* → Office Space, Shop, Showroom, etc.
-  - *Industrial* → Warehouse, Factory, etc.
-  - *Plot* → Residential Plot, Commercial Plot, Agricultural Land, etc.
+| Construction Status selected | Age of Property | Possession By |
+|:----------------------------|:---:|:---:|
+| **Ready To Move** | ✅ Shown (required) | ❌ Hidden |
+| **Under Construction** | ❌ Hidden | ✅ Shown (required) |
+
+
+### Possession By — Date Shortcuts
+
+When **Possession By** appears, you can either pick a date from a calendar or use quick-select buttons:
+
+| Button | Sets date to |
+|--------|-------------|
+| Within 3 Months | 3 months from today |
+| Within 6 Months | 6 months from today |
+| By Next Year | 1 year from today |
+| By Next-to-Next Year | 2 years from today |
+| By Next-to-Next-to-Next Year | 3 years from today |
+
+### Locality / Street — Address Entry
+
+> [!TIP]
+> You can enter the project address in two ways:
+> 1. **Type and select** — Start typing and pick a suggestion from Google Maps. This auto-fills Locality, City, State, Pincode, and Country.
+> 2. **Manual entry** — Click the **"Change"** link to open a popup where you can type each address field separately (Locality, City, State, Pincode, Country).
+>
+> Use the **✕** button next to the address to clear it and start over.
 
 ---
 
-## Section 2: Location
+## Section 2: Project Attributes
 
 | # | Field Name | Required? | What it does |
-|---|-----------|-----------|-------------|
-| 5 | **Building / Project / Society Name** | ✅ Yes | Name of the building, project, or society |
-| 6 | **Tower / Wing** | No | Tower or wing name within the project |
-| 7 | **Locality / Street** | ✅ Yes | Address with Google Maps autocomplete. Can also be entered manually via "Change" button |
-
-### Dependencies in this section
-
-- The **label** of field #5 changes based on Property Type:
-
-| Property Type | Label shown |
-|---------------|------------|
-| Residential | Building / Project / Society Name |
-| Commercial | Building / Project / Society Name |
-| Industrial | Industry Name |
-| Plot | Plot Name |
-
-- **Tower / Wing** is only visible in **Advance** mode.
-
----
-
-## Section 3: Features *(Advance mode only)*
-
-This is the section with the most complex dependencies. Fields appear or disappear based on both **Property For** and **Property Type**.
-
-### Field Visibility Overview
-
-| # | Field Name | Sell + Residential | Sell + Commercial | Sell + Industrial | Sell + Plot | Rent + Residential | Rent + Commercial | Rent + Industrial |
-|---|-----------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| 8 | **Area Type** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 9 | **Area Measurement** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 10 | **Dimensions (Length × Breadth)** | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ |
-| 11 | **Front Road Width** | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ |
-| 12 | **Unit Bedrooms** | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| 13 | **No. of Bathrooms** | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| 14 | **No. of Balconies** | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| 15 | **Other Rooms** | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| 16 | **Seating Capacity** | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| 17 | **Floor No.** | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
-| 18 | **Total Floors** | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
-| 19 | **No. of Washrooms** | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| 20 | **Pantries** | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| 21 | **Cafeteria** | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| 22 | **Furnished Status** | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
-| 23 | **Furnished Details** | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
-| 24 | **Availability Status** | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
-
-> **In simple terms:**
-> - **Bedrooms, Bathrooms, Balconies, Other Rooms** → only for **Residential** properties
-> - **Seating Capacity** → only for **Commercial** properties
-> - **Washrooms, Pantries, Cafeteria** → only for **Commercial** and **Industrial** properties
-> - **Dimensions & Front Road Width** → only for **Industrial** and **Plot** properties
-> - **Plot** type hides the most fields (no availability, no furnished status, etc.)
-
-### Area Type options also change
-
-| Property Type | Available Area Types |
-|---------------|---------------------|
-| Residential | Carpet, Super, Built |
-| Commercial | Carpet, Super, Built |
-| Industrial | Carpet, Plot |
-| Plot | Plot only |
+|---|-----------|:---------:|-------------|
+| 9 | **Project Plot / Premises Area** | No | Total project area with a unit selector (Sq. Ft., Sq. Mt., Acres, Hectares, etc.) |
+| 10 | **Furnished Status** | No | Unfurnished / Semi-Furnished / Furnished |
+| 11 | **Furnished Details** | No | Multi-select list of furnishing items available |
+| 12 | **Common Amenities** | No | Multi-select searchable list — Swimming Pool, Gym, Playground, Club House, etc. |
+| 13 | **Flooring Info** | No | Multi-select — Marble, Vitrified, Wooden, Granite, etc. |
+| 14 | **Car Parking** | No | Multi-select — Covered, Open, etc. |
+| 15 | **Water Availability** | No | Multi-select — Municipal, Borewell, 24-hour, etc. |
+| 16 | **Electricity Status** | No | Single select — Available, Not Available, etc. |
+| 17 | **Landmark / Attraction Details** | No | Free-text to describe notable landmarks near the project |
+| 18 | **Approved Banks for Loans** | No | Multi-select — banks that have approved this project for home loans |
+| 19 | **Approved By** | No | Multi-select — government/regulatory bodies that approved the project (RERA, Municipal Corporation, etc.) |
+| 20 | **Upload Project Images/Videos** | No | Upload images and videos with category tags (Main Image, Floor Plan, Others, etc.) |
+| 21 | **Video Link** | No | External video links with a type selector (YouTube, etc.). You can add multiple links (max 10) by clicking **+** |
+| 22 | **Upload Legal DOCs** | No | Upload legal documents (PDF, DOC, images) with document type tags. Max file size: 4 MB |
+| 23 | **Short Description** | No | Free-text project description |
+| 24 | **Publish on Website** | ✅ Yes | Yes / No — whether to show this project on your public website. Only visible if the website module is enabled |
 
 ### Furnished Status → Furnished Details
 
 ```mermaid
 graph LR
     FS{"Furnished Status"}
-    UF["Unfurnished"]
+    UNF["Unfurnished"]
     SF["Semi-Furnished"]
-    FF["Fully-Furnished"]
+    FF["Furnished"]
 
-    FS --> UF --> H["❌ Furnished Details hidden"]
-    FS --> SF --> S["✅ Furnished Details shown<br>with semi-furnished items"]
-    FS --> FF --> F["✅ Furnished Details shown<br>with fully-furnished items"]
+    FS --> UNF
+    FS --> SF
+    FS --> FF
 
-    style UF fill:#E74C3C,color:#fff
+    UNF --> U1["❌ Furnished Details — hidden"]
+    SF --> S1["✅ Furnished Details — shown<br>(filtered for semi-furnished items)"]
+    FF --> F1["✅ Furnished Details — shown<br>(filtered for fully-furnished items)"]
+
+    style UNF fill:#E74C3C,color:#fff
     style SF fill:#F39C12,color:#fff
     style FF fill:#27AE60,color:#fff
 ```
 
-### Availability Status → Sub-fields
+| Furnished Status selected | Furnished Details |
+|:-------------------------|:---:|
+| **Unfurnished** | ❌ Hidden |
+| **Semi-Furnished** | ✅ Shown (semi-furnished item options) |
+| **Furnished** | ✅ Shown (fully-furnished item options) |
 
-```mermaid
-graph LR
-    AS{"Availability Status"}
-    RTM["Ready To Move"]
-    UC["Under Construction"]
-
-    AS --> RTM
-    AS --> UC
-
-    RTM --> A1["✅ Age of Property — shown"]
-    RTM --> A2["✅ Available By — shown"]
-    RTM --> A3["❌ Possession By — hidden"]
-
-    UC --> B1["❌ Age of Property — hidden"]
-    UC --> B2["❌ Available By — hidden"]
-    UC --> B3["✅ Possession By — shown<br>(date picker with quick-pick buttons)"]
-
-    style RTM fill:#27AE60,color:#fff
-    style UC fill:#E67E22,color:#fff
-```
-
-| # | Field Name | Shown when |
-|---|-----------|-----------|
-| 25 | **Age of Property** | Availability Status = **Ready To Move** |
-| 26 | **Available By** | Availability Status = **Ready To Move** |
-| 27 | **Possession By** | Availability Status = **Under Construction** |
-
----
-
-## Section 4: Price
-
-| # | Field Name | Required? | What it does |
-|---|-----------|-----------|-------------|
-| 28 | **Cost Type** | No | Choose pricing model |
-| 29 | **Expected Price / Amount** | ✅ Yes | The price amount (label changes based on Cost Type) |
-| 30 | **Negotiable** | No | Checkbox — is the price negotiable? |
-| 31 | **PLC Charges** | No | Preferential Location Charges |
-| 32 | **Parking Charges** | No | Parking cost |
-| 33 | **Annual Maintenance** | No | Maintenance charges (Monthly / Yearly / One Time) |
-| 34 | **One Time Other Charges** | No | Any other one-time costs |
-| 35 | **Security Deposit** | No | Security deposit for rental |
-| 36 | **Other Charges (Rent)** | No | Additional rental charges |
-| 37 | **Brokerage** | No | Brokerage amount in ₹ or % |
-| 38 | **Price Comment / Description** | No | Free text for price notes |
-
-### Cost Type controls which price fields appear
-
-```mermaid
-graph TD
-    PF2{"Property For"}
-    SELL2["Sell"]
-    RENT2["Rent"]
-
-    PF2 --> SELL2
-    PF2 --> RENT2
-
-    SELL2 --> CT{"Cost Type<br>(you choose)"}
-    RENT2 --> MR2["Monthly Rent<br>(auto-selected, Cost Type hidden)"]
-
-    CT --> EP["Expected Price"]
-    CT --> PKG["Package Price"]
-    CT --> DET["Price Per Area Unit"]
-
-    EP --> EP1["✅ Price amount field only"]
-    PKG --> PKG1["✅ Price amount field only"]
-    DET --> DET1["✅ Price amount field<br>+ PLC Charges<br>+ Parking Charges<br>+ Annual Maintenance<br>+ One Time Other Charges"]
-    MR2 --> MR3["✅ Price amount field<br>+ Security Deposit<br>+ Other Charges"]
-
-    style SELL2 fill:#27AE60,color:#fff
-    style RENT2 fill:#E67E22,color:#fff
-    style EP fill:#3498DB,color:#fff
-    style PKG fill:#9B59B6,color:#fff
-    style DET fill:#E67E22,color:#fff
-    style MR2 fill:#1ABC9C,color:#fff
-```
-
-> [!TIP]
-> The **price label** dynamically changes — it says "Expected Price", "Package Price", "Price Per Area Unit", or "Monthly Rent" based on what you've selected.
-
-### Brokerage behavior
-- When Brokerage Type is **₹** → shows the approximate **percentage** of the price
-- When Brokerage Type is **%** → shows the approximate **₹ value** calculated from the price
-
----
-
-## Section 5: Amenities *(Advance mode only)*
-
-| # | Field Name | Sell+Res | Sell+Com | Sell+Ind | Sell+Plot | Rent+Res | Rent+Com | Rent+Ind |
-|---|-----------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| 39 | **Amenities** (multi-select) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 40 | **Flooring Info** (multi-select) | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| 41 | **Facing** | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
-| 42 | **Overlooking** (multi-select) | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| 43 | **Car Parking** | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
-| 44 | **Water Available** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 45 | **Status of Electricity** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 46 | **Landmark / Attraction Details** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+### Image Upload Rules
 
 > [!NOTE]
-> The **Amenities** dropdown options also change based on Property Type — Residential amenities differ from Commercial amenities, etc.
+> - You can upload both **images** and **videos**
+> - **Maximum 3 videos** can be uploaded per project
+> - Each image/video must be assigned a **type** (Main Image, Floor Plan, Others, etc.)
+> - You cannot select **"Main Image"** more than once — the system will prevent duplicates
+> - Images are automatically **compressed** and converted to **WebP** format for optimal performance
+> - **Maximum video file size**: 50 MB per video
+
+### Legal Documents
+
+> [!NOTE]
+> - Supported formats: **GIF, JPG, PNG, JPEG, PDF, DOC, DOCX**
+> - **Maximum file size**: 4 MB per document
+> - Each document can be tagged with a **type** (Sale Deed, Agreement, NOC, etc.)
 
 ---
 
-## Section 6: Legal Details *(Advance mode, primarily for Sell)*
+## Section 3: Nearby Locations
 
-| # | Field Name | Sell+Res | Sell+Com | Sell+Ind | Sell+Plot |
-|---|-----------|:--:|:--:|:--:|:--:|
-| 47 | **Project RERA ID** | ✅ | ✅ | ✅ | ❌ |
-| 48 | **Ownership Status** | ✅ | ✅ | ✅ | ❌ |
-| 49 | **Approved Bank** (multi-select) | ✅ | ✅ | ✅ | ❌ |
-| 50 | **Approved By** (multi-select) | ✅ | ✅ | ✅ | ❌ |
-| 51 | **Upload Legal Documents** | ✅ | ✅ | ✅ | ✅ |
+This section lets you add points of interest around the project.
 
-> The **Co-operative** ownership option is **hidden when Property Type = Industrial**.
+| # | Field Name | Required? | What it does |
+|---|-----------|:---------:|-------------|
+| 25 | **Location Category** | No | Type of nearby place — School, Hospital, Railway Station, Bus Stop, Shopping Mall, etc. |
+| 26 | **Place Name** | No | Name of the specific place (max 50 characters) |
+| 27 | **Distance** | No | How far the place is, with a unit selector |
+| 28 | **Distance Unit** | No | Kilometer / Meter / Minutes |
 
----
+### Adding Multiple Locations
 
-## Section 7: More Details
-
-| # | Field Name | Notes |
-|---|-----------|-------|
-| 52 | **Upload Property Images / Videos** | Max 3 videos, one "Main Image" required. Videos cannot be set as Main Image. |
-| 53 | **Video Link** | External video links (YouTube, etc.). Up to 10 links. *(Advance mode only)* |
-| 54 | **Short Description** | Public-facing description of the property |
-| 55 | **Publish on Website** | Yes / No — only appears if the Website module is enabled for your account |
+- Click the **+** button to add more nearby locations
+- You can add up to **30** nearby locations per project
+- Click the **✕** button to remove a location entry
 
 ---
 
-## Section 8: Private Details *(Advance mode only, collapsible)*
+## Section 4: Project Layout
+
+This section defines the building structure (wings/towers).
+
+| # | Field Name | Required? | What it does |
+|---|-----------|:---------:|-------------|
+| 29 | **Wing Name** | ✅ Yes | Name of the wing or tower (e.g., "A Wing", "Tower 1"). Max 12 characters |
+| 30 | **Total Floor** | ✅ Yes | Number of floors in this wing. Maximum 100 |
+| 31 | **Property per Floor** | ✅ Yes | Number of units/flats per floor. Maximum 20 |
+
+### Layout Rules
 
 > [!WARNING]
-> These details are **private** — they are only visible to you and **cannot be shared** with leads or customers.
+> - **Wing names must be unique** — you cannot have two wings with the same name. The system will highlight duplicates in red and block saving.
+> - You can add up to **30 wings** per project using the **+** button
+> - For existing projects, changing floor count or units per floor is validated against existing properties — the system warns you if properties are already associated with a wing and prevents removal.
 
-| # | Field Name | Notes |
-|---|-----------|-------|
-| 56 | **Flat No.** | Only shown for Residential & Commercial properties |
-| 57 | **Source Person** | Who gave you this property (Owner, Broker, etc.) |
-| 58 | **Person Name** | Name of the source person |
-| 59 | **Contact No.** | Up to 3 contact numbers, each with a type (Personal / Home / Office) |
-| 60 | **Email ID** | Email of the source person |
-| 61 | **Private Description** | Internal notes about the property |
+---
+
+## Section 5: Owner Details (Private / Collapsible)
+
+This section is **collapsed by default**. Click **"Add Owner Details"** to expand it.
+
+> [!IMPORTANT]
+> These details are **private** — they are only visible to you and your team. They will **NOT** be shared when sharing the project with leads or customers.
+
+| # | Field Name | Required? | What it does |
+|---|-----------|:---------:|-------------|
+| 32 | **Name** | No | Owner's full name |
+| 33 | **Contact** | No | Owner's phone number (must be exactly 10 digits) |
+| 34 | **Email Id** | No | Owner's email address |
+| 35 | **Private Description** | No | Internal notes about the owner or project that should not be shared |
 
 ---
 
@@ -310,40 +239,27 @@ graph TD
 
 ```mermaid
 graph TD
-    FM["📋 Form Mode<br>Quick or Advance"] 
-    PF["🏠 Property For<br>Sell or Rent"]
-    PT["🏢 Property Type<br>Residential / Commercial<br>Industrial / Plot"]
+    CS["🏗️ Construction Status"]
+    FS["🛋️ Furnished Status"]
+    IMG["🖼️ Image Type"]
+    WN["🏢 Wing Names"]
 
-    FM -->|"Advance shows<br>all sections below"| PF
+    CS -->|"Ready To Move"| AOP["Age of Property<br>(shown, required)"]
+    CS -->|"Under Construction"| PB["Possession By<br>(shown, required)"]
+  
 
-    PF -->|"Controls"| PFrom["Property From<br>🟢 Sell only"]
-    PF -->|"Controls"| PT
-    PF -->|"Controls"| CostT["Cost Type<br>🟢 Sell: you choose<br>🟠 Rent: auto Monthly Rent"]
+    FS -->|"Furnished / Semi-Furnished"| FD["Furnished Details<br>(shown with filtered options)"]
+    FS -->|"Unfurnished"| FD_HIDE["Furnished Details hidden"]
 
-    PT -->|"Filters options"| Cat["Property Category"]
-    PT -->|"Filters options"| Amen["Amenities dropdown"]
-    PT -->|"Controls label"| PName["Project Name label"]
-    PT -->|"Controls which<br>fields are visible"| Features["All Feature Fields<br>(Bedrooms, Bathrooms,<br>Floor, Area, etc.)"]
-    PT -->|"Controls visibility"| Legal["Legal Details"]
+    IMG -->|"Only one allowed"| MI["Main Image<br>(duplicate check)"]
+    IMG -->|"Videos cannot be"| NO_MAIN["Main Image type"]
 
-    Features --> FS["Furnished Status"]
-    FS -->|"Controls"| FD["Furnished Details"]
+    WN -->|"Must be unique"| DUP["Duplicate check<br>blocks saving"]
 
-    Features --> AS["Availability Status"]
-    AS -->|"Ready To Move"| AgeAvail["Age of Property<br>+ Available By"]
-    AS -->|"Under Construction"| Poss["Possession By"]
-
-    CostT -->|"Expected / Package"| SimplePrice["Price amount only"]
-    CostT -->|"Per Area Unit"| DetailPrice["Price + PLC + Parking<br>+ Maintenance + Other"]
-    CostT -->|"Monthly Rent"| RentPrice["Price + Security Deposit<br>+ Other Charges"]
-
-    style FM fill:#7B68EE,color:#fff
-    style PF fill:#2E86C1,color:#fff
-    style PT fill:#2E86C1,color:#fff
-    style PFrom fill:#27AE60,color:#fff
-    style CostT fill:#E67E22,color:#fff
-    style FS fill:#F39C12,color:#fff
-    style AS fill:#1ABC9C,color:#fff
+    style CS fill:#2E86C1,color:#fff
+    style FS fill:#E67E22,color:#fff
+    style IMG fill:#9B59B6,color:#fff
+    style WN fill:#1ABC9C,color:#fff
 ```
 
 ---
@@ -352,9 +268,30 @@ graph TD
 
 | When you change... | These fields are affected |
 |--------------------|--------------------------|
-| **Property For** (Sell ↔ Rent) | Property From visibility, Plot option in Property Type, Cost Type, all feature fields, legal details visibility |
-| **Property Type** (Residential / Commercial / Industrial / Plot) | Property Category options, Project Name label, all feature fields visibility, Area Type options, Amenities options, Legal fields visibility |
-| **Furnished Status** | Furnished Details (hidden if Unfurnished) |
-| **Availability Status** | Age of Property & Available By ↔ Possession By |
-| **Cost Type** | Which price sub-fields are shown (detailed vs. rent vs. simple) |
-| **Brokerage Type** (₹ vs %) | Brokerage calculation display |
+| **Construction Status** (Ready To Move / Under Construction) | Age of Property (shown for Ready To Move), Possession By (shown for Under Construction) |
+| **Furnished Status** (Unfurnished / Semi-Furnished / Furnished) | Furnished Details dropdown — hidden for Unfurnished, shown with filtered options for others |
+| **Image Type selection** | "Main Image" can only be selected once — system prevents duplicate selection |
+| **Wing Name** | Must be unique across all wings — duplicates are highlighted in red and block form submission |
+
+---
+
+## Validation Rules
+
+| Field | Rule |
+|-------|------|
+| Project Name | Required |
+| Project Rera Number | Only uppercase letters, numbers, and `/` allowed |
+| Locality / Street | Required |
+| Construction Status | Required |
+| Age of Property | Required when Construction Status = "Ready To Move" |
+| Possession By | Required when Construction Status = "Under Construction" |
+| Wing Name | Required, max 12 characters, must be unique |
+| Total Floor | Required, numeric, between 1 and 100 |
+| Property per Floor | Required, numeric, between 1 and 20 |
+| Owner Contact | Must be exactly 10 digits (if entered) |
+| Legal Documents | Max 4 MB each; allowed: GIF, JPG, PNG, JPEG, PDF, DOC, DOCX |
+| Project Images/Videos | Max 3 videos, max 50 MB per video; only one "Main Image" allowed |
+| Nearby Locations | Max 30 entries; Place Name max 50 characters |
+| Video Links | Max 10 links |
+| Publish on Website | Required (if website module is enabled) |
+
